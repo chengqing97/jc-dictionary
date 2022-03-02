@@ -1,7 +1,6 @@
-# 无道词典
+# 实用小词典
 
-- [] Disable rotating
-- [] Better previous functionality
-- [] Welcome message
-- [] 实用小词典
-- [] Voice buttons animation
+- [ ] Disable rotating
+- [ ] Better previous functionality
+- [ ] Welcome message
+- [ ] Voice buttons animation
