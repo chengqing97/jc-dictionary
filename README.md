@@ -1,4 +1,4 @@
-# wudao_dictionary
+# 无道词典
 
 - [] Disable rotating
 - [] Better previous functionality
