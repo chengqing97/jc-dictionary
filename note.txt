@@ -1,0 +1,26 @@
+# Generate Icon
+flutter pub run flutter_launcher_icons:main
+
+**Note: Change "minSdkVersion flutter.minSdkVersion" to "minSdkVersion 21" 
+in android/app/build.gradle before running the command and change it back after running the command.
+
+Reference:
+https://github.com/fluttercommunity/flutter_launcher_icons/issues/324#issuecomment-1013611137
+https://stackoverflow.com/questions/70580684/flutter-launcher-icons-not-working-unhandled-exception-formatexception-invalid
+
+
+# Generate Splash Screen
+flutter pub run flutter_native_splash:create
+
+
+# Check Version
+- pubspec.yaml
+
+# Build
+flutter build appbundle
+
+
+hello
+世界
+Hey, how is it going?
+简单粗暴实用小词典

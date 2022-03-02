@@ -1,4 +1,4 @@
-package com.example.jc_dictionary
+package com.cqcreative.jcdictionary
 
 import io.flutter.embedding.android.FlutterActivity
 

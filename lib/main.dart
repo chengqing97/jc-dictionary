@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'lib.dart';
 import 'package:http/http.dart' as http;
 import 'package:just_audio/just_audio.dart';
-
-const primarySwatch = Colors.pink;
+import 'styles.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,27 +14,16 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'JC Dictionary',
+      title: '实用小词典',
       theme: ThemeData(
-        fontFamily: "GenJyuuGothicL",
-        primarySwatch: primarySwatch,
+        fontFamily: "Roboto",
+        primarySwatch: Colors.grey,
+        primaryColor: Colors.white,
       ),
       home: const MainPage(),
+      debugShowCheckedModeBanner: false,
     );
   }
-}
-
-class Styles {
-  static TextStyle get searchText => const TextStyle(fontSize: 14);
-  static TextStyle get keywordText => const TextStyle(fontSize: 18, fontWeight: FontWeight.w700);
-  static TextStyle get loadingText => const TextStyle(fontSize: 14, color: Colors.grey);
-  static TextStyle get phoneticsText =>
-      const TextStyle(fontSize: 14, color: primarySwatch, fontFamily: "GenJyuuGothicL");
-  static TextStyle get resultText => const TextStyle(fontSize: 14, height: 1.4, color: Colors.black);
-  static TextStyle get noResultText =>
-      const TextStyle(fontSize: 16, height: 1.4, color: primarySwatch, fontWeight: FontWeight.bold);
-  static TextStyle get suggestionText =>
-      const TextStyle(fontSize: 14, height: 1.4, color: primarySwatch, fontWeight: FontWeight.bold);
 }
 
 class MainPage extends StatefulWidget {
@@ -45,15 +33,16 @@ class MainPage extends StatefulWidget {
   State<MainPage> createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage> {
+class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   LookupResult? _lookupResult;
   String _inputText = "";
   String _currentSearch = "";
   String _errorText = "";
+  bool _isBeforeStartTyping = true;
   final searchBoxController = TextEditingController();
   late http.Client client;
   late AudioPlayer player;
-  List<String> _history = [];
+  final List<String> _history = [];
 
   void _handleSearch([String? specialSearch]) async {
     var toSearch = specialSearch ?? _inputText;
@@ -86,6 +75,7 @@ class _MainPageState extends State<MainPage> {
   @override
   void initState() {
     super.initState();
+
     client = http.Client();
     player = AudioPlayer();
   }
@@ -101,13 +91,10 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Styles.primaryColor,
         centerTitle: true,
-        title: const Text("简词"),
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            bottom: Radius.elliptical(240, 5),
-          ),
-        ),
+        title: Text("简单粗暴", style: Styles.appTitle),
+        shadowColor: Colors.black.withOpacity(0.3),
       ),
       body: SafeArea(
         child: Column(
@@ -115,96 +102,130 @@ class _MainPageState extends State<MainPage> {
           children: [
             // Results
             Expanded(
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // SizedBox(height: 30),
-                      if (_currentSearch.isNotEmpty)
-                        Text("Looking up $_currentSearch...", style: Styles.loadingText)
-                      else if (_errorText.isNotEmpty)
-                        Text(_errorText, style: Styles.resultText)
-                      else if (_lookupResult != null) ...[
-                        if (_lookupResult!.definition == null && _lookupResult!.suggestions == null)
-                          Text("No result", style: Styles.noResultText),
-                        if (_lookupResult!.definition != null) ...[
-                          Text(_lookupResult!.keyword, style: Styles.keywordText),
-                          const SizedBox(height: 20),
-                          () {
-                            String text = "";
-                            if (_lookupResult!.ukPronunciation != null) {
-                              text += "英 ${_lookupResult!.ukPronunciation}  ";
-                            }
-                            if (_lookupResult!.usPronunciation != null) {
-                              text += "美 ${_lookupResult!.usPronunciation}";
-                            }
-                            if (text.isEmpty) return Container();
-                            return Text(text, style: Styles.phoneticsText);
-                          }(),
-                          const SizedBox(height: 2),
-                          Text(_lookupResult!.definition!, style: Styles.resultText)
-                        ],
-                        if (_lookupResult?.suggestions != null) ...[
-                          if (_lookupResult!.definition != null) const SizedBox(height: 60),
-                          Text("Are you looking for:", style: Styles.resultText),
-                          for (var item in _lookupResult!.suggestions!)
-                            GestureDetector(
-                              onTap: () => _handleSearch(item.word),
-                              child: RichText(
-                                text: TextSpan(style: Styles.resultText.copyWith(height: 1.6), children: [
-                                  TextSpan(text: "${item.word}  ", style: Styles.suggestionText),
-                                  TextSpan(text: item.def ?? ""),
-                                ]),
+              child: ShaderMask(
+                shaderCallback: (Rect rect) {
+                  return LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Colors.white.withOpacity(0), Colors.white],
+                    stops: const [0.95, 1.0],
+                  ).createShader(rect);
+                },
+                blendMode: BlendMode.dstOut,
+                child: CustomScrollView(
+                  physics: const BouncingScrollPhysics(
+                      parent: AlwaysScrollableScrollPhysics()),
+                  slivers: [
+                    SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 30),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (_currentSearch.isNotEmpty)
+                              Text("Looking up $_currentSearch...",
+                                  style: Styles.loadingText)
+                            else if (_errorText.isNotEmpty)
+                              Text(_errorText, style: Styles.resultText)
+                            else if (_lookupResult != null) ...[
+                              if (_lookupResult!.definition == null &&
+                                  _lookupResult!.suggestions == null)
+                                Text("No result", style: Styles.noResultText),
+                              if (_lookupResult!.definition != null) ...[
+                                Text(_lookupResult!.keyword,
+                                    style: Styles.keywordText),
+                                const SizedBox(height: 20),
+                                () {
+                                  String text = "";
+                                  if (_lookupResult!.ukPronunciation != null) {
+                                    text +=
+                                        "英 ${_lookupResult!.ukPronunciation}  ";
+                                  }
+                                  if (_lookupResult!.usPronunciation != null) {
+                                    text +=
+                                        "美 ${_lookupResult!.usPronunciation}";
+                                  }
+                                  if (text.isEmpty) return Container();
+                                  return Text(text,
+                                      style: Styles.phoneticsText);
+                                }(),
+                                const SizedBox(height: 2),
+                                Text(_lookupResult!.definition!,
+                                    style: Styles.resultText)
+                              ],
+                              if (_lookupResult?.suggestions != null) ...[
+                                if (_lookupResult!.definition != null)
+                                  const SizedBox(height: 60),
+                                Text("Are you looking for:",
+                                    style: Styles.resultText),
+                                for (var item in _lookupResult!.suggestions!)
+                                  GestureDetector(
+                                    onTap: () => _handleSearch(item.word),
+                                    child: RichText(
+                                      text: TextSpan(
+                                          style: Styles.resultText
+                                              .copyWith(height: 1.6),
+                                          children: [
+                                            TextSpan(
+                                                text: "${item.word}  ",
+                                                style: Styles.suggestionText),
+                                            TextSpan(text: item.def ?? ""),
+                                          ]),
+                                    ),
+                                  ),
+                              ],
+                            ] else
+                              const Expanded(
+                                child: Center(
+                                    child: Text("你好！",
+                                        style: TextStyle(fontSize: 16))),
                               ),
-                            ),
-                        ],
-                      ] else
-                        Center(
-                            child: Column(
-                          children: [Text("你好！")],
-                        )),
-                    ],
-                  ),
+                          ],
+                        ),
+                      ),
+                    )
+                  ],
                 ),
               ),
             ),
             // Search Box
             Padding(
-              padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+              padding: const EdgeInsets.fromLTRB(12, 5, 12, 10),
               child: Row(
                 children: [
                   Expanded(
                     child: Container(
+                      height: 34,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(100),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.black87,
-                            blurRadius: 1,
-                            blurStyle: BlurStyle.outer,
-                            offset: Offset.zero,
-                            spreadRadius: 0,
-                          ),
-                        ],
-                      ),
+                          borderRadius: BorderRadius.circular(100),
+                          border:
+                              Border.all(color: Styles.lightGrey, width: 1)),
                       child: Row(
                         children: [
                           Expanded(
                             child: TextField(
-                              onChanged: (text) => setState(() => _inputText = text),
+                              onChanged: (text) => setState(() {
+                                _inputText = text;
+                                _isBeforeStartTyping = false;
+                              }),
                               controller: searchBoxController,
                               onEditingComplete: _handleSearch,
                               autofocus: true,
                               style: Styles.searchText,
                               cursorColor: Colors.black,
                               cursorWidth: 1,
-                              decoration: const InputDecoration(
+                              textInputAction: TextInputAction.search,
+                              decoration: InputDecoration(
+                                hintText: _isBeforeStartTyping
+                                    ? "Start typing..."
+                                    : "",
+                                hintStyle: Styles.loadingText,
                                 border: InputBorder.none,
                                 isDense: true,
-                                contentPadding: EdgeInsets.fromLTRB(14, 5, 5, 5),
+                                contentPadding:
+                                    const EdgeInsets.fromLTRB(14, 5, 5, 5),
                                 filled: false,
                               ),
                             ),
@@ -218,32 +239,39 @@ class _MainPageState extends State<MainPage> {
                                 });
                               },
                               child: Container(
-                                height: 30,
-                                width: 30,
+                                height: 34,
+                                width: 34,
                                 margin: const EdgeInsets.only(right: 3),
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(15),
+                                  borderRadius: BorderRadius.circular(17),
                                 ),
                                 child: const Center(
                                   child: Icon(Icons.close_rounded, size: 16),
                                 ),
                               ),
                             )
-                          else if (_lookupResult != null && _inputText != _lookupResult!.keyword)
+                          else if (_lookupResult != null &&
+                              _inputText != _lookupResult!.keyword)
                             GestureDetector(
                               onTap: () {
-                                searchBoxController.text = _lookupResult!.keyword;
+                                searchBoxController.text =
+                                    _lookupResult!.keyword;
                                 searchBoxController.selection =
-                                    TextSelection.fromPosition(TextPosition(offset: _lookupResult!.keyword.length));
+                                    TextSelection.fromPosition(TextPosition(
+                                        offset: _lookupResult!.keyword.length));
                                 setState(() {
                                   _inputText = _lookupResult!.keyword;
                                 });
                               },
                               child: Container(
-                                height: 30,
-                                margin: const EdgeInsets.only(right: 16),
-                                child: const Center(
-                                  child: Text("Previous", style: TextStyle(color: Colors.grey, fontSize: 12)),
+                                height: 34,
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 16),
+                                child: Center(
+                                  child: Text("Previous",
+                                      style: TextStyle(
+                                          color: Styles.darkGrey,
+                                          fontSize: 12)),
                                 ),
                               ),
                             ),
@@ -253,49 +281,56 @@ class _MainPageState extends State<MainPage> {
                   ),
                   // Voice Buttons
                   if (_lookupResult?.ukVoice != null)
-                    GestureDetector(
+                    VoiceButton(
                       onTap: () async {
                         await player.setUrl(_lookupResult!.ukVoice!);
                         player.play();
                       },
-                      child: Container(
-                        height: 30,
-                        width: 30,
-                        margin: const EdgeInsets.only(left: 12),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15), color: Theme.of(context).primaryColor),
-                        child: const Center(
-                          child: Text(
-                            "英",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ),
+                      text: "英",
                     ),
                   if (_lookupResult?.usVoice != null)
-                    GestureDetector(
+                    VoiceButton(
                       onTap: () async {
                         await player.setUrl(_lookupResult!.usVoice!);
                         player.play();
                       },
-                      child: Container(
-                        height: 30,
-                        width: 30,
-                        margin: const EdgeInsets.only(left: 10),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15), color: Theme.of(context).primaryColor),
-                        child: const Center(
-                          child: Text(
-                            "美",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ),
+                      text: "美",
                     ),
                 ],
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+// Voice Button
+class VoiceButton extends StatelessWidget {
+  const VoiceButton({Key? key, required this.onTap, required this.text})
+      : super(key: key);
+
+  final Function() onTap;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 34,
+        width: 34,
+        margin: const EdgeInsets.only(left: 12),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(17),
+          color: Styles.primaryColor,
+        ),
+        child: Center(
+          child: Text(
+            text,
+            style: TextStyle(color: Styles.darkGrey),
+          ),
         ),
       ),
     );
