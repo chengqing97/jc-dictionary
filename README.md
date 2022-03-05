@@ -27,7 +27,8 @@ Extremely simple and functional mobile dictionary grabbing definitions and trans
 
 ### To-dos
 
-- [ ] Better "previous" function
+- [ ] Offline dictionary
+- [ ] Better history function
 
-### Bugs
-- [ ] "Previous" button sometime is not working
+### Known issues
+- [ ] When first time playing voice, the first few hundred milliseconds is not played 
