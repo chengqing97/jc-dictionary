@@ -41,7 +41,6 @@ Future<LookupResult> lookup(String toSearch, http.Client client) async {
   final url = Uri.parse("https://dict.youdao.com/w/$toSearch");
   try {
     var response = await client.read(url);
-
     final isTranslate = RegExp(r'<div id="fanyiToggle">').hasMatch(response);
 
     if (isTranslate) {
@@ -115,8 +114,9 @@ String? grabEnglishWords(String response) {
         .firstMatch(item.group(0) ?? "")
         ?.group(0);
     var definitionLine = "";
-    if (wordType != null && !wordType.contains(";"))
+    if (wordType != null && !wordType.contains(";")) {
       definitionLine += "$wordType ";
+    }
     definitionLine += "$def";
     definitionLines.add(definitionLine);
   }
