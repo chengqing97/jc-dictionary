@@ -38,7 +38,7 @@ class ResultArea extends StatelessWidget {
                             Text("Looking up ${c.searching.value}...",
                                 style: Styles.loadingText)
                           else if (c.lookupState.value == LookupState.error)
-                            Text(c.errorText.value, style: Styles.resultText)
+                            Text(c.errorText.value, style: Styles.errorText)
                           else if (c.lookupState.value ==
                               LookupState.success) ...[
                             if (c.lookupResult.value!.definition == null &&
@@ -139,7 +139,7 @@ class Phonetics extends StatelessWidget {
             GestureDetector(
               onTap: () => c.playVoice(Accent.uk),
               child: Text("英 ${c.lookupResult.value!.ukPronunciation}",
-                  style: c.lookupResult.value!.ukVoice != null
+                  style: c.voiceUrl.value.uk != null
                       ? Styles.phoneticsText
                       : Styles.phoneticsTextDisabled),
             ),
@@ -149,7 +149,7 @@ class Phonetics extends StatelessWidget {
             GestureDetector(
               onTap: () => c.playVoice(Accent.us),
               child: Text("美 ${c.lookupResult.value!.usPronunciation}",
-                  style: c.lookupResult.value!.usVoice != null
+                  style: c.voiceUrl.value.us != null
                       ? Styles.phoneticsText
                       : Styles.phoneticsTextDisabled),
             ),

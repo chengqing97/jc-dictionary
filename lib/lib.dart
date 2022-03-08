@@ -1,4 +1,7 @@
 import 'package:http/http.dart' as http;
+import 'dart:async';
+import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
 
 enum Status { success, noResult }
 
@@ -13,34 +16,38 @@ class Suggestion {
   }
 }
 
+class VoiceUrl {
+  String? uk;
+  String? us;
+
+  VoiceUrl({this.uk, this.us});
+}
+
 class LookupResult {
   String keyword;
   String? ukPronunciation;
   String? usPronunciation;
   String? definition;
   List<Suggestion>? suggestions;
-  String? ukVoice;
-  String? usVoice;
 
-  LookupResult(
-      {required this.keyword,
-      this.ukPronunciation,
-      this.usPronunciation,
-      this.definition,
-      this.suggestions,
-      this.ukVoice,
-      this.usVoice});
+  LookupResult({
+    required this.keyword,
+    this.ukPronunciation,
+    this.usPronunciation,
+    this.definition,
+    this.suggestions,
+  });
 
   @override
   toString() {
-    return "keyword: $keyword, ukPronunciation: $ukPronunciation, usPronunciation: $usPronunciation, definition: $definition, suggestions: $suggestions, uskVoice: $usVoice, ukVoice: $usVoice";
+    return "keyword: $keyword, ukPronunciation: $ukPronunciation, usPronunciation: $usPronunciation, definition: $definition, suggestions: $suggestions";
   }
 }
 
 Future<LookupResult> lookup(String toSearch, http.Client client) async {
   final url = Uri.parse("https://dict.youdao.com/w/$toSearch");
   try {
-    var response = await client.read(url);
+    final response = await client.read(url);
     final isTranslate = RegExp(r'<div id="fanyiToggle">').hasMatch(response);
 
     if (isTranslate) {
@@ -59,21 +66,12 @@ Future<LookupResult> lookup(String toSearch, http.Client client) async {
     final hasSuggestion = RegExp(r'您要找的是不是').hasMatch(response);
 
     if (hasResult || hasSuggestion) {
-      VoiceUrl voiceUrl;
-      try {
-        voiceUrl = await getVoiceUrl(toSearch, client);
-      } catch (_) {
-        voiceUrl = VoiceUrl();
-      }
-
       return LookupResult(
         keyword: toSearch,
         ukPronunciation: grabUkPronunciation(response),
         usPronunciation: grabUsPronunciation(response),
         definition: hasResult ? grabFormalDefinition(response) : null,
         suggestions: hasSuggestion ? grabSuggestion(response) : null,
-        ukVoice: voiceUrl.uk,
-        usVoice: voiceUrl.us,
       );
     }
 
@@ -176,26 +174,27 @@ List<Suggestion>? grabSuggestion(String response) {
   return suggestions;
 }
 
-class VoiceUrl {
-  String? uk;
-  String? us;
-
-  VoiceUrl({this.uk, this.us});
-}
-
 Future<VoiceUrl> getVoiceUrl(String keyword, http.Client client) async {
-  final url =
-      Uri.parse("https://dictionary.cambridge.org/dictionary/english/$keyword");
-  var response = await client.read(url, headers: {"user-agent": 'curl/7.77.0'});
+  try {
+    final url = Uri.parse(
+        "https://dictionary.cambridge.org/dictionary/english/$keyword");
+    final response =
+        await client.read(url, headers: {"user-agent": 'curl/7.77.0'});
 
-  var ukPath =
-      RegExp(r"media/english/uk_pron/[\S]*.mp3").firstMatch(response)?.group(0);
-  var usPath =
-      RegExp(r"media/english/us_pron/[\S]*.mp3").firstMatch(response)?.group(0);
+    final ukPath = RegExp(r"media/english/uk_pron/[\S]*.mp3")
+        .firstMatch(response)
+        ?.group(0);
+    final usPath = RegExp(r"media/english/us_pron/[\S]*.mp3")
+        .firstMatch(response)
+        ?.group(0);
 
-  const host = "https://dictionary.cambridge.org/";
+    const host = "https://dictionary.cambridge.org/";
 
-  return VoiceUrl(
+    return VoiceUrl(
       uk: ukPath == null ? null : host + ukPath,
-      us: usPath == null ? null : host + usPath);
+      us: usPath == null ? null : host + usPath,
+    );
+  } catch (error) {
+    return VoiceUrl();
+  }
 }

@@ -105,12 +105,12 @@ class InputBar extends StatelessWidget {
                   ),
                 ),
                 // Voice Buttons
-                if (c.lookupResult.value?.ukVoice != null)
+                if (c.voiceUrl.value.uk != null)
                   VoiceButton(
                     onTap: () => c.playVoice(Accent.uk),
                     text: "英",
                   ),
-                if (c.lookupResult.value?.usVoice != null)
+                if (c.voiceUrl.value.us != null)
                   VoiceButton(
                     onTap: () => c.playVoice(Accent.us),
                     text: "美",

@@ -18,6 +18,7 @@ class Controller extends FullLifeCycleController {
   final errorText = "".obs;
   final lookupState = LookupState.init.obs;
   final lookupResult = Rx<LookupResult?>(null);
+  final voiceUrl = VoiceUrl().obs;
   late http.Client client;
   late final AudioPlayer player;
   final inputController = TextEditingController().obs;
@@ -26,8 +27,6 @@ class Controller extends FullLifeCycleController {
   @override
   onInit() {
     super.onInit();
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light
-        .copyWith(systemNavigationBarColor: Colors.white));
     WidgetsBinding.instance!.addObserver(this);
     client = http.Client();
     player = AudioPlayer();
@@ -72,16 +71,20 @@ class Controller extends FullLifeCycleController {
     searching.value = toSearch;
     lookupState.value = LookupState.searching;
     lookupResult.value = null;
+    voiceUrl.value = VoiceUrl();
     errorText.value = "";
     inputController.value.clear();
 
     try {
-      var result = await lookup(toSearch, client);
+      final searchVoice = getVoiceUrl(toSearch, client);
+      final result = await lookup(toSearch, client);
       lookupResult.value = result;
       lookupState.value = LookupState.success;
       // we clear again because if you search another word too quickly consecutive search might not trigger rerender as a result the second searched word is still on the screen
       // the condition is to avoid clearing the word that user type whilst the app is searching the previous word
       if (inputController.value.text.isEmpty) inputController.value.clear();
+
+      voiceUrl.value = await searchVoice;
     } on SocketException {
       // Previous request has been canceled
     } catch (error) {
@@ -100,12 +103,12 @@ class Controller extends FullLifeCycleController {
 
   void playVoice(Accent accent) async {
     if (lookupResult.value == null) return;
-    if (accent == Accent.uk && lookupResult.value!.ukVoice != null) {
-      await player.setUrl(lookupResult.value!.ukVoice!);
+    if (accent == Accent.uk && voiceUrl.value.uk != null) {
+      await player.setUrl(voiceUrl.value.uk!);
       player.play();
     }
-    if (accent == Accent.us && lookupResult.value!.usVoice != null) {
-      await player.setUrl(lookupResult.value!.usVoice!);
+    if (accent == Accent.us && voiceUrl.value.us != null) {
+      await player.setUrl(voiceUrl.value.us!);
       player.play();
     }
   }

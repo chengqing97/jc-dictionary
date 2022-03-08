@@ -28,7 +28,7 @@ class Styles {
       TextStyle(fontSize: 16, color: darkPrimaryColor);
 
   static TextStyle get phoneticsTextDisabled =>
-      phoneticsText.copyWith(color: lightGrey, fontWeight: FontWeight.w500);
+      phoneticsText.copyWith(color: lightGrey);
 
   static TextStyle get resultText =>
       const TextStyle(fontSize: 16, height: 1.4, color: Colors.black);
@@ -47,6 +47,9 @@ class Styles {
 
   static TextStyle get suggestionDefinition =>
       const TextStyle(fontSize: 16, height: 1.1, color: Colors.black);
+
+  static TextStyle get errorText =>
+      const TextStyle(fontSize: 16, color: Colors.red);
 
   static TextStyle get voiceButtonText =>
       TextStyle(fontSize: 16, color: darkGrey, height: 1);
