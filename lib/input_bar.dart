@@ -14,14 +14,16 @@ class InputBarController extends FullLifeCycleController {
   @override
   void onInit() {
     super.onInit();
+    Timer(const Duration(milliseconds: 100), () => focusNode.requestFocus());
     WidgetsBinding.instance!.addObserver(this);
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      focusNode.unfocus();
       Timer(const Duration(milliseconds: 100), () => focusNode.requestFocus());
+    } else {
+      focusNode.unfocus();
     }
   }
 
@@ -62,9 +64,8 @@ class InputBar extends StatelessWidget {
                           child: Center(
                             child: TextField(
                               focusNode: ic.focusNode,
-                              controller: c.inputController.value,
+                              controller: c.inputController,
                               onEditingComplete: c.handleSearch,
-                              autofocus: true,
                               style: Styles.inputText,
                               cursorColor: Styles.darkPrimaryColor,
                               cursorWidth: 1.5,
@@ -87,7 +88,7 @@ class InputBar extends StatelessWidget {
                         ),
                         if (c.inputText.value.isNotEmpty)
                           GestureDetector(
-                            onTap: () => c.inputController.value.clear(),
+                            onTap: () => c.inputController.clear(),
                             child: Container(
                               height: inputHeight,
                               width: inputHeight,
@@ -105,16 +106,8 @@ class InputBar extends StatelessWidget {
                   ),
                 ),
                 // Voice Buttons
-                if (c.voiceUrl.value.uk != null)
-                  VoiceButton(
-                    onTap: () => c.playVoice(Accent.uk),
-                    text: "英",
-                  ),
-                if (c.voiceUrl.value.us != null)
-                  VoiceButton(
-                    onTap: () => c.playVoice(Accent.us),
-                    text: "美",
-                  ),
+                if (c.voiceUrl.value.uk != null) const VoiceButton(Accent.uk),
+                if (c.voiceUrl.value.us != null) const VoiceButton(Accent.us),
               ],
             ),
           ),
@@ -124,32 +117,58 @@ class InputBar extends StatelessWidget {
   }
 }
 
-class VoiceButton extends StatelessWidget {
-  const VoiceButton({Key? key, required this.onTap, required this.text})
-      : super(key: key);
+class VoiceButton extends StatefulWidget {
+  const VoiceButton(this.accent, {Key? key}) : super(key: key);
 
-  final Function() onTap;
-  final String text;
+  final Accent accent;
 
   @override
+  State<VoiceButton> createState() => _VoiceButtonState();
+}
+
+class _VoiceButtonState extends State<VoiceButton> {
+  var isPlaying = false;
+  @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: inputHeight,
-        width: inputHeight,
-        margin: const EdgeInsets.only(left: 12),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(17),
-          color: Styles.primaryColor,
-        ),
-        child: Center(
-          child: Text(
-            text,
-            style: Styles.voiceButtonText,
+    final c = Get.put(Controller());
+    return Row(
+      children: [
+        const SizedBox(width: 12),
+        GestureDetector(
+          onTap: () async {
+            setState(() => isPlaying = true);
+            await c.playVoice(widget.accent);
+            setState(() => isPlaying = false);
+          },
+          child: Stack(
+            children: [
+              Container(
+                height: inputHeight,
+                width: inputHeight,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(17),
+                  color: Styles.primaryColor,
+                ),
+                child: Center(
+                  child: Text(
+                    widget.accent == Accent.uk ? "英" : "美",
+                    style: Styles.voiceButtonText,
+                  ),
+                ),
+              ),
+              if (isPlaying)
+                SizedBox(
+                  height: inputHeight - 1,
+                  width: inputHeight - 1,
+                  child: CircularProgressIndicator(
+                    color: Styles.darkPrimaryColor,
+                    strokeWidth: 1,
+                  ),
+                )
+            ],
           ),
         ),
-      ),
+      ],
     );
   }
 }

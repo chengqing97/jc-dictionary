@@ -1,7 +1,5 @@
 import 'package:http/http.dart' as http;
 import 'dart:async';
-import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
 
 enum Status { success, noResult }
 
@@ -198,3 +196,19 @@ Future<VoiceUrl> getVoiceUrl(String keyword, http.Client client) async {
     return VoiceUrl();
   }
 }
+
+
+// Future<File>? ukFileFuture;
+//     Future<File>? usFileFuture;
+
+//     if (ukPath != null) {
+//       ukFileFuture = DefaultCacheManager().getSingleFile(host + ukPath);
+//     }
+//     if (usPath != null) {
+//       usFileFuture = DefaultCacheManager().getSingleFile(host + usPath);
+//     }
+
+//     return VoiceFile(
+//       uk: await ukFileFuture,
+//       us: await usFileFuture,
+//     );

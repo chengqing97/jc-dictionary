@@ -1,6 +1,6 @@
 name: jc_dictionary
 description: A new Flutter project.
-publish_to: "none" # Remove this line if you wish to publish to pub.dev
+publish_to: "none"
 version: 0.1.4+5
 
 environment:
@@ -14,7 +14,6 @@ dependencies:
   just_audio: ^0.9.20
   flutter_native_splash: ^2.0.5
   get: ^4.6.1
-  sqflite: ^2.0.2
 
 dev_dependencies:
   flutter_test:

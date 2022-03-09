@@ -7,54 +7,49 @@ import 'input_bar.dart';
 import 'result_area.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:flutter/services.dart';
-import 'dart:async';
 
 enum LookupState { init, searching, success, error }
 enum Accent { uk, us }
 
-class Controller extends FullLifeCycleController {
+class Controller extends GetxController {
   final searching = "".obs;
   final errorText = "".obs;
   final lookupState = LookupState.init.obs;
   final lookupResult = Rx<LookupResult?>(null);
   final voiceUrl = VoiceUrl().obs;
-  late http.Client client;
-  late final AudioPlayer player;
-  final inputController = TextEditingController().obs;
   final inputText = "".obs;
+  final isGettingVoiceUrl = false.obs;
+
+  late TextEditingController inputController;
+  late http.Client youdaoClient;
+  late http.Client voiceClient;
+  late AudioPlayer ukPlayer;
+  late AudioPlayer usPlayer;
+  Future? ukPlayerFuture;
+  Future? usPlayerFuture;
+  bool ukPlayerIsLoaded = false;
+  bool usPlayerIsLoaded = false;
 
   @override
   onInit() {
     super.onInit();
-    WidgetsBinding.instance!.addObserver(this);
-    client = http.Client();
-    player = AudioPlayer();
-    inputController.value.addListener(() {
-      inputText.value = inputController.value.text;
+    youdaoClient = http.Client();
+    voiceClient = http.Client();
+    ukPlayer = AudioPlayer();
+    usPlayer = AudioPlayer();
+    inputController = TextEditingController();
+    inputController.addListener(() {
+      inputText.value = inputController.text;
     });
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    Timer? timer;
-    if (state == AppLifecycleState.inactive) {
-      timer = Timer(const Duration(minutes: 5), () {
-        searching.value = "";
-        lookupResult.value = null;
-        lookupState.value = LookupState.init;
-      });
-    }
-    if (state == AppLifecycleState.resumed) {
-      timer?.cancel();
-    }
-  }
-
-  @override
   void onClose() {
-    inputController.value.dispose();
-    client.close();
-    WidgetsBinding.instance!.addObserver(this);
+    inputController.dispose();
+    youdaoClient.close();
+    voiceClient.close();
+    ukPlayer.dispose();
+    usPlayer.dispose();
     super.onClose();
   }
 
@@ -64,27 +59,26 @@ class Controller extends FullLifeCycleController {
     if (toSearch.isEmpty) return;
 
     if (lookupState.value == LookupState.searching) {
-      client.close();
-      client = http.Client();
+      youdaoClient.close();
+      youdaoClient = http.Client();
+    }
+    if (isGettingVoiceUrl.value) {
+      voiceClient.close();
+      voiceClient = http.Client();
     }
 
+    inputController.clear();
     searching.value = toSearch;
     lookupState.value = LookupState.searching;
     lookupResult.value = null;
     voiceUrl.value = VoiceUrl();
     errorText.value = "";
-    inputController.value.clear();
 
     try {
-      final searchVoice = getVoiceUrl(toSearch, client);
-      final result = await lookup(toSearch, client);
+      await getVoice(toSearch);
+      final result = await lookup(toSearch, youdaoClient);
       lookupResult.value = result;
       lookupState.value = LookupState.success;
-      // we clear again because if you search another word too quickly consecutive search might not trigger rerender as a result the second searched word is still on the screen
-      // the condition is to avoid clearing the word that user type whilst the app is searching the previous word
-      if (inputController.value.text.isEmpty) inputController.value.clear();
-
-      voiceUrl.value = await searchVoice;
     } on SocketException {
       // Previous request has been canceled
     } catch (error) {
@@ -94,22 +88,53 @@ class Controller extends FullLifeCycleController {
         return;
       }
       errorText.value = error.toString();
-      if (inputController.value.text.isEmpty) {
-        inputController.value.text = searching.value;
+      if (inputController.text.isEmpty) {
+        inputController.text = searching.value;
+        inputController.selection = TextSelection.fromPosition(
+            TextPosition(offset: searching.value.length));
       }
       lookupState.value = LookupState.error;
     }
   }
 
-  void playVoice(Accent accent) async {
+  Future getVoice(String toSearch) async {
+    try {
+      isGettingVoiceUrl.value = true;
+      final VoiceUrl urls = await getVoiceUrl(toSearch, youdaoClient);
+
+      voiceUrl.value = urls;
+      if (urls.uk != null) {
+        ukPlayerIsLoaded = false;
+        ukPlayerFuture = ukPlayer.setUrl(urls.uk!, preload: true);
+      }
+      if (urls.us != null) {
+        usPlayerIsLoaded = false;
+        usPlayerFuture = usPlayer.setUrl(urls.us!);
+      }
+    } finally {
+      isGettingVoiceUrl.value = false;
+    }
+  }
+
+  Future playVoice(Accent accent) async {
     if (lookupResult.value == null) return;
     if (accent == Accent.uk && voiceUrl.value.uk != null) {
-      await player.setUrl(voiceUrl.value.uk!);
-      player.play();
+      if (!ukPlayerIsLoaded) {
+        await ukPlayerFuture;
+        ukPlayerIsLoaded = true;
+      }
+      await ukPlayer.seek(Duration.zero);
+      await ukPlayer.play();
+      ukPlayer.stop();
     }
     if (accent == Accent.us && voiceUrl.value.us != null) {
-      await player.setUrl(voiceUrl.value.us!);
-      player.play();
+      if (!usPlayerIsLoaded) {
+        await usPlayerFuture;
+        usPlayerIsLoaded = true;
+      }
+      await usPlayer.seek(Duration.zero);
+      await usPlayer.play();
+      usPlayer.stop();
     }
   }
 }

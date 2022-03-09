@@ -93,11 +93,9 @@ class ResultArea extends StatelessWidget {
                 left: Styles.padding,
                 child: GestureDetector(
                   onTap: () {
-                    c.inputController.value.text =
-                        c.lookupResult.value!.keyword;
-                    c.inputController.value.selection =
-                        TextSelection.fromPosition(
-                            TextPosition(offset: c.inputText.value.length));
+                    c.inputController.text = c.lookupResult.value!.keyword;
+                    c.inputController.selection = TextSelection.fromPosition(
+                        TextPosition(offset: c.inputText.value.length));
                   },
                   child: Container(
                     constraints: BoxConstraints(
@@ -133,28 +131,42 @@ class Phonetics extends StatelessWidget {
 
     if (c.lookupResult.value!.ukPronunciation != null ||
         c.lookupResult.value!.usPronunciation != null) {
-      return Row(
-        children: [
-          if (c.lookupResult.value!.ukPronunciation != null) ...[
-            GestureDetector(
-              onTap: () => c.playVoice(Accent.uk),
-              child: Text("英 ${c.lookupResult.value!.ukPronunciation}",
-                  style: c.voiceUrl.value.uk != null
-                      ? Styles.phoneticsText
-                      : Styles.phoneticsTextDisabled),
-            ),
-            const SizedBox(width: 10),
+      return Obx(() {
+        return Row(
+          children: [
+            if (c.lookupResult.value!.ukPronunciation != null) ...[
+              GestureDetector(
+                onTap: () => c.playVoice(Accent.uk),
+                child: Text("英 ${c.lookupResult.value!.ukPronunciation}",
+                    style: c.voiceUrl.value.uk != null
+                        ? Styles.phoneticsText
+                        : Styles.phoneticsTextDisabled),
+              ),
+              const SizedBox(width: 10),
+            ],
+            if (c.lookupResult.value!.usPronunciation != null) ...[
+              GestureDetector(
+                onTap: () => c.playVoice(Accent.us),
+                child: Text("美 ${c.lookupResult.value!.usPronunciation}",
+                    style: c.voiceUrl.value.us != null
+                        ? Styles.phoneticsText
+                        : Styles.phoneticsTextDisabled),
+              ),
+              const SizedBox(width: 14),
+            ],
+            if (c.isGettingVoiceUrl.value &&
+                c.lookupState.value == LookupState.success)
+              SizedBox(
+                height: 10,
+                width: 10,
+                child: CircularProgressIndicator(
+                  color: Styles.darkPrimaryColor,
+                  strokeWidth: 1,
+                ),
+              ),
           ],
-          if (c.lookupResult.value!.usPronunciation != null)
-            GestureDetector(
-              onTap: () => c.playVoice(Accent.us),
-              child: Text("美 ${c.lookupResult.value!.usPronunciation}",
-                  style: c.voiceUrl.value.us != null
-                      ? Styles.phoneticsText
-                      : Styles.phoneticsTextDisabled),
-            ),
-        ],
-      );
+        );
+      });
     } else {
       return Container();
     }
