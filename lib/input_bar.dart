@@ -3,6 +3,7 @@ import 'styles.dart';
 import 'package:get/get.dart';
 import 'home_page.dart';
 import 'dart:async';
+import 'dart:io' show Platform;
 
 const double inputHeight = 34;
 const double inputBottomPadding = 10;
@@ -14,12 +15,14 @@ class InputBarController extends FullLifeCycleController {
   @override
   void onInit() {
     super.onInit();
-    Timer(const Duration(milliseconds: 100), () => focusNode.requestFocus());
+    if (!Platform.isIOS)
+      Timer(const Duration(milliseconds: 100), () => focusNode.requestFocus());
     WidgetsBinding.instance!.addObserver(this);
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (Platform.isIOS) return;
     if (state == AppLifecycleState.resumed) {
       Timer(const Duration(milliseconds: 100), () => focusNode.requestFocus());
     } else {
@@ -66,6 +69,7 @@ class InputBar extends StatelessWidget {
                               focusNode: ic.focusNode,
                               controller: c.inputController,
                               onEditingComplete: c.handleSearch,
+                              autofocus: Platform.isIOS,
                               style: Styles.inputText,
                               cursorColor: Styles.darkPrimaryColor,
                               cursorWidth: 1.5,
