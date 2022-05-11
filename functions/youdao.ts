@@ -1,38 +1,32 @@
-import axios from "axios";
 import { LookupResult, Suggestion } from "./types";
 
-export async function lookup(toSearch: string): Promise<LookupResult> {
-  try {
-    const response = (await axios.get(`https://dict.youdao.com/w/${toSearch}`)).data as string;
-    const isTranslate = response.includes(`<div id="fanyiToggle">`);
+export function grabResult(toSearch: string, response: string): LookupResult {
+  const isTranslate = response.includes(`<div id="fanyiToggle">`);
 
-    if (isTranslate) {
-      return { keyword: toSearch, definition: grabTranslation(response) };
-    }
-
-    const isChinese = response.includes("英语怎么说");
-
-    if (isChinese) {
-      return { keyword: toSearch, definition: grabEnglishWords(response) };
-    }
-
-    const hasResult = response.includes('<h2 class="wordbook-js">');
-    const hasSuggestion = response.includes("您要找的是不是");
-
-    if (hasResult || hasSuggestion) {
-      return {
-        keyword: toSearch,
-        ukPhonetic: grabUkPhonetic(response),
-        usPhonetic: grabUsPhonetic(response),
-        definition: hasResult ? grabFormalDefinition(response) : undefined,
-        suggestions: hasSuggestion ? grabSuggestion(response) : undefined,
-      };
-    }
-
-    return { keyword: toSearch };
-  } catch (error) {
-    throw error;
+  if (isTranslate) {
+    return { keyword: toSearch, definition: grabTranslation(response) };
   }
+
+  const isChinese = response.includes("英语怎么说");
+
+  if (isChinese) {
+    return { keyword: toSearch, definition: grabEnglishWords(response) };
+  }
+
+  const hasResult = response.includes('<h2 class="wordbook-js">');
+  const hasSuggestion = response.includes("您要找的是不是");
+
+  if (hasResult || hasSuggestion) {
+    return {
+      keyword: toSearch,
+      ukPhonetic: grabUkPhonetic(response),
+      usPhonetic: grabUsPhonetic(response),
+      definition: hasResult ? grabFormalDefinition(response) : undefined,
+      suggestions: hasSuggestion ? grabSuggestion(response) : undefined,
+    };
+  }
+
+  return { keyword: toSearch };
 }
 
 function grabTranslation(response: string): string | undefined {

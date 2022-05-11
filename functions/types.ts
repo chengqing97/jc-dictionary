@@ -12,8 +12,3 @@ export type LookupResult = {
 };
 
 export type LookupStatus = "init" | "searching" | "success" | "error";
-
-export type VoiceUrl = {
-  uk?: string;
-  us?: string;
-};

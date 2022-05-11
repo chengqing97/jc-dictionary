@@ -1,16 +1,27 @@
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View, Pressable, ActivityIndicator } from "react-native";
 import React from "react";
-import { errorMessageState, lookupResultState, lookupStatusState, searchingTextState } from "../functions/states";
+import {
+  errorMessageState,
+  lookupResultState,
+  lookupStatusState,
+  searchingTextState,
+  playbackObjectState,
+  isLoadingVoiceState,
+} from "../functions/states";
 import { useRecoilValue } from "recoil";
 import { darkPrimaryColor } from "../functions/constants";
+import usePlayVoice from "../hooks/usePlayVoice";
+import useSearch from "../hooks/useSearch";
 
 export default function ResultArea() {
   const lookupStatus = useRecoilValue(lookupStatusState);
   const lookupResult = useRecoilValue(lookupResultState);
   const searchingText = useRecoilValue(searchingTextState);
   const errorMessage = useRecoilValue(errorMessageState);
-
-  console.log(lookupResult);
+  const playVoice = usePlayVoice();
+  const search = useSearch();
+  const playbackObject = useRecoilValue(playbackObjectState);
+  const isLoadingVoice = useRecoilValue(isLoadingVoiceState);
 
   if (lookupStatus === "init")
     return (
@@ -19,7 +30,7 @@ export default function ResultArea() {
       </View>
     );
   return (
-    <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.body}>
+    <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.body} keyboardShouldPersistTaps="handled">
       {(() => {
         if (lookupStatus === "searching")
           return <Text style={styles.loadingText}>{`Looking up ${searchingText}...`}</Text>;
@@ -32,8 +43,29 @@ export default function ResultArea() {
 
                 {(lookupResult.ukPhonetic || lookupResult.usPhonetic) && (
                   <View style={styles.phoneticContainer}>
-                    <Text style={styles.phonetic}>{`英  ${lookupResult.ukPhonetic}`}</Text>
-                    <Text style={styles.phonetic}>{`美  ${lookupResult.usPhonetic}`}</Text>
+                    {lookupResult.ukPhonetic && (
+                      <Pressable
+                        onPress={() => playVoice("uk")}
+                        hitSlop={{ top: 10, bottom: 10 }}
+                        disabled={!playbackObject.uk}
+                      >
+                        <Text
+                          style={[styles.phonetic, { color: playbackObject.uk ? darkPrimaryColor : "grey" }]}
+                        >{`英  ${lookupResult.ukPhonetic}`}</Text>
+                      </Pressable>
+                    )}
+                    {lookupResult.usPhonetic && (
+                      <Pressable
+                        onPress={() => playVoice("us")}
+                        hitSlop={{ top: 10, bottom: 10 }}
+                        disabled={!playbackObject.us}
+                      >
+                        <Text
+                          style={[styles.phonetic, { color: playbackObject.us ? darkPrimaryColor : "grey" }]}
+                        >{`美  ${lookupResult.usPhonetic}`}</Text>
+                      </Pressable>
+                    )}
+                    {isLoadingVoice && <ActivityIndicator color={"grey"} />}
                   </View>
                 )}
 
@@ -44,10 +76,12 @@ export default function ResultArea() {
                 {lookupResult.suggestions && (
                   <>
                     <Text style={styles.suggestionHeader}>您是否要找：</Text>
-                    {lookupResult.suggestions.map((item) => {
+                    {lookupResult.suggestions.map((item, index) => {
                       return (
-                        <View style={styles.suggestionRow}>
-                          <Text style={styles.suggestionText}>{item.word}</Text>
+                        <View style={styles.suggestionRow} key={index}>
+                          <Pressable onPress={() => search(item.word)}>
+                            <Text style={styles.suggestionText}>{item.word}</Text>
+                          </Pressable>
                           <Text style={styles.suggestionDefinition}>{item.def}</Text>
                         </View>
                       );
@@ -100,25 +134,24 @@ const styles = StyleSheet.create({
   definition: {
     fontFamily: "Roboto-R",
     fontSize: 16,
+    marginBottom: 30,
   },
   suggestionHeader: {
     fontFamily: "Roboto-R",
     fontSize: 16,
-    marginTop: 30,
   },
   suggestionRow: {
-    flexDirection: "row",
-    height: 16 * 2,
-    alignItems: "center",
+    marginTop: 8,
   },
   suggestionText: {
     fontFamily: "Roboto-M",
-    fontSize: 16,
+    fontSize: 18,
     color: darkPrimaryColor,
   },
   suggestionDefinition: {
     fontFamily: "Roboto-R",
     fontSize: 16,
+    marginBottom: 30,
   },
   noResultText: {
     fontFamily: "Roboto-M",

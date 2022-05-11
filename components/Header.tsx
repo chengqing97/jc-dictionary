@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, StatusBar, SafeAreaView } from "react-native";
-import { primaryColor } from "../functions/constants";
+import { darkPrimaryColor, primaryColor } from "../functions/constants";
 
 export default function Header() {
   return (
@@ -16,6 +16,10 @@ const styles = StyleSheet.create({
     backgroundColor: primaryColor,
     paddingTop: StatusBar.currentHeight,
     elevation: 4,
+    shadowColor: darkPrimaryColor,
+    shadowRadius: 4,
+    shadowOpacity: 0.4,
+    shadowOffset: { height: 0, width: 0 },
   },
   contentContainer: {
     height: 60,

@@ -1,5 +1,6 @@
 import { atom } from "recoil";
-import { LookupStatus, LookupResult, VoiceUrl } from "./types";
+import { LookupStatus, LookupResult } from "./types";
+import { Audio } from "expo-av";
 
 export const lookupStatusState = atom<LookupStatus>({
   key: "lookupStatusState",
@@ -21,7 +22,17 @@ export const errorMessageState = atom({
   default: "",
 });
 
-export const voiceUrlState = atom<VoiceUrl>({
-  key: "",
+export const playbackObjectState = atom<{ uk?: Audio.Sound; us?: Audio.Sound }>({
+  key: "playbackObjectState",
   default: {},
+});
+
+export const isLoadingVoiceState = atom({
+  key: "isLoadingVoiceState",
+  default: false,
+});
+
+export const axiosControllerState = atom({
+  key: "axiosControllerState",
+  default: new AbortController(),
 });
