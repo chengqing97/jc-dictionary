@@ -27,6 +27,7 @@ Extremely simple and functional mobile dictionary grabbing definitions and trans
 
 - [ ] history function
 - [ ] clear input function
+- [ ] sponsor function
 - [ ] Better history function
 
 ### Issues
