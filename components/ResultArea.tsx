@@ -86,7 +86,20 @@ export default function ResultArea() {
                         </View>
                       );
                     })}
+                    <View style={{ height: 30 }} />
                   </>
+                )}
+
+                {lookupResult.isLocal && (
+                  <View style={styles.youdaoButtonView}>
+                    <Pressable
+                      style={styles.youdaoButton}
+                      onPress={() => search(lookupResult.keyword, true)}
+                      hitSlop={10}
+                    >
+                      <Text style={styles.youdaoButtonText}>Search on Youdao</Text>
+                    </Pressable>
+                  </View>
                 )}
               </>
             );
@@ -97,10 +110,13 @@ export default function ResultArea() {
   );
 }
 
+const buttonHeight = 30;
+
 const styles = StyleSheet.create({
   body: {
     paddingVertical: 40,
     paddingHorizontal: 20,
+    flexGrow: 1,
   },
   greetingText: {
     fontFamily: "Roboto-R",
@@ -151,11 +167,28 @@ const styles = StyleSheet.create({
   suggestionDefinition: {
     fontFamily: "Roboto-R",
     fontSize: 16,
-    marginBottom: 30,
   },
   noResultText: {
     fontFamily: "Roboto-M",
     fontSize: 18,
     color: darkPrimaryColor,
+  },
+
+  youdaoButtonView: {
+    alignItems: "center",
+    justifyContent: "center",
+    flex: 1,
+    paddingHorizontal: 30,
+  },
+  youdaoButton: {
+    borderWidth: 1,
+    borderColor: "lightgrey",
+    borderRadius: 100,
+    paddingHorizontal: 12,
+    paddingVertical: 3,
+  },
+  youdaoButtonText: {
+    fontFamily: "Roboto-R",
+    fontSize: 16,
   },
 });

@@ -25,9 +25,10 @@ Extremely simple and functional mobile dictionary grabbing definitions and trans
 
 ### To-dos
 
-- [ ] Offline dictionary
+- [ ] history function
+- [ ] clear input function
 - [ ] Better history function
 
-### Known issues
+### Issues
 
-- [ ] When first time playing voice, the first few hundred milliseconds is not played
+- [ ] cannot unzip database on ios
