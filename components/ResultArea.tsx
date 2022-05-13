@@ -23,15 +23,15 @@ export default function ResultArea() {
   const playbackObject = useRecoilValue(playbackObjectState);
   const isLoadingVoice = useRecoilValue(isLoadingVoiceState);
 
-  if (lookupStatus === "init")
-    return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        <Text style={styles.greetingText}>你好！</Text>
-      </View>
-    );
   return (
     <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.body} keyboardShouldPersistTaps="handled">
       {(() => {
+        if (lookupStatus === "init")
+          return (
+            <View style={{ flexGrow: 1, alignItems: "center", justifyContent: "center" }}>
+              <Text style={styles.greetingText}>你好！</Text>
+            </View>
+          );
         if (lookupStatus === "searching")
           return <Text style={styles.loadingText}>{`Looking up ${searchingText}...`}</Text>;
         if (lookupStatus === "error") return <Text style={styles.errorText}>{errorMessage}</Text>;
@@ -109,8 +109,6 @@ export default function ResultArea() {
     </ScrollView>
   );
 }
-
-const buttonHeight = 30;
 
 const styles = StyleSheet.create({
   body: {

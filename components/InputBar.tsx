@@ -1,4 +1,5 @@
 import {
+  Dimensions,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -15,6 +16,7 @@ import { isLoadingVoiceState, playbackObjectState, searchingTextState } from "..
 import { Audio } from "expo-av";
 import usePlayVoice from "../hooks/usePlayVoice";
 import useSearch from "../hooks/useSearch";
+import { Feather } from "@expo/vector-icons";
 
 export default function InputBar() {
   const [inputText, setInputText] = useState("");
@@ -40,10 +42,7 @@ export default function InputBar() {
     try {
       await search(inputText);
     } catch (error) {
-      if (!inputText) {
-        setInputText(searchingText);
-        // TODO put cursor position to the end
-      }
+      if (!inputText) setInputText(searchingText);
     }
   }
 
@@ -51,16 +50,23 @@ export default function InputBar() {
     <KeyboardAvoidingView behavior="padding" enabled={Platform.OS === "ios"}>
       <SafeAreaView>
         <View style={styles.body}>
-          <TextInput
-            ref={inputRef}
-            style={styles.textInput}
-            selectionColor={Platform.OS === "ios" ? darkPrimaryColor : undefined}
-            blurOnSubmit={false}
-            autoFocus={Platform.OS === "ios"}
-            onSubmitEditing={handleSearch}
-            value={inputText}
-            onChangeText={(text) => setInputText(text)}
-          />
+          <View style={styles.inputBox}>
+            <TextInput
+              ref={inputRef}
+              style={styles.textInput}
+              selectionColor={Platform.OS === "ios" ? darkPrimaryColor : undefined}
+              blurOnSubmit={false}
+              autoFocus={Platform.OS === "ios"}
+              onSubmitEditing={handleSearch}
+              value={inputText}
+              onChangeText={(text) => setInputText(text)}
+            />
+            {!!inputText && (
+              <Pressable style={styles.clearButton}>
+                <Feather name="x" size={18} color="black" />
+              </Pressable>
+            )}
+          </View>
           {!isLoadingVoice && playbackObject.uk && (
             <Pressable style={styles.voiceButton} onPress={() => playVoice("uk")}>
               <Text style={styles.voiceButtonText}>英</Text>
@@ -69,6 +75,13 @@ export default function InputBar() {
           {!isLoadingVoice && playbackObject.us && (
             <Pressable style={styles.voiceButton} onPress={() => playVoice("us")}>
               <Text style={styles.voiceButtonText}>美</Text>
+            </Pressable>
+          )}
+          {!!searchingText && (
+            <Pressable style={styles.tagButton} hitSlop={5} onPress={() => setInputText(searchingText)}>
+              <Text style={styles.tagButtonText} textBreakStrategy="highQuality">
+                {searchingText}
+              </Text>
             </Pressable>
           )}
         </View>
@@ -86,15 +99,26 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: gap,
   },
-  textInput: {
-    borderRadius: inputBoxHeight,
+  inputBox: {
+    borderRadius: inputBoxHeight / 2,
     borderWidth: 1,
-    flex: 1,
-    height: inputBoxHeight,
     borderColor: "lightgrey",
+    height: inputBoxHeight,
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  textInput: {
+    flex: 1,
     fontFamily: "Roboto-R",
     fontSize: 16,
     paddingHorizontal: inputBoxHeight / 3,
+  },
+  clearButton: {
+    height: inputBoxHeight,
+    width: inputBoxHeight,
+    alignItems: "center",
+    justifyContent: "center",
   },
   voiceButton: {
     height: inputBoxHeight,
@@ -108,5 +132,22 @@ const styles = StyleSheet.create({
   voiceButtonText: {
     fontFamily: "Roboto-R",
     fontSize: 16,
+  },
+
+  tagButton: {
+    borderWidth: 1,
+    borderColor: "lightgrey",
+    borderRadius: 100,
+    paddingHorizontal: 12,
+    paddingVertical: 3,
+    position: "absolute",
+    bottom: inputBoxHeight + gap * 1.5,
+    left: gap,
+    maxWidth: Math.min(300, Dimensions.get("screen").width),
+    backgroundColor: "white",
+  },
+  tagButtonText: {
+    fontFamily: "Roboto-R",
+    fontSize: 14,
   },
 });

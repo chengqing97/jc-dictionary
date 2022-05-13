@@ -25,8 +25,7 @@ Extremely simple and functional mobile dictionary grabbing definitions and trans
 
 ### To-dos
 
-- [ ] history function
-- [ ] clear input function
+- [ ] splash screen and icon
 - [ ] sponsor function
 - [ ] Better history function
 
