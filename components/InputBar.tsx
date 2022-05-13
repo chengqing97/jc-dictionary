@@ -62,7 +62,7 @@ export default function InputBar() {
               onChangeText={(text) => setInputText(text)}
             />
             {!!inputText && (
-              <Pressable style={styles.clearButton}>
+              <Pressable style={styles.clearButton} onPress={() => setInputText("")}>
                 <Feather name="x" size={18} color="black" />
               </Pressable>
             )}

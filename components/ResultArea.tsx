@@ -179,14 +179,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
   },
   youdaoButton: {
-    borderWidth: 1,
-    borderColor: "lightgrey",
-    borderRadius: 100,
+    // borderWidth: 1,
+    // borderColor: "lightgrey",
+    // borderRadius: 100,
     paddingHorizontal: 12,
     paddingVertical: 3,
   },
   youdaoButtonText: {
-    fontFamily: "Roboto-R",
+    fontFamily: "Roboto-M",
     fontSize: 16,
+    color: darkPrimaryColor,
   },
 });

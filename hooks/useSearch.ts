@@ -69,12 +69,12 @@ export default function useSearch() {
       database?.transaction((tx) => {
         tx.executeSql(
           "SELECT phonetic, translation FROM stardict WHERE word = ?;",
-          [toSearch.toLocaleLowerCase()],
+          [toSearch.toLocaleLowerCase().trim()],
           (_, { rows }) => {
             if (rows.length > 0 && rows.item(0).translation) {
               const result: LookupResult = {
                 keyword: toSearch,
-                usPhonetic: rows.item(0).phonetic || undefined,
+                usPhonetic: rows.item(0).phonetic ? `[${rows.item(0).phonetic}]` : undefined,
                 definition: rows.item(0).translation,
                 isLocal: true,
               };
