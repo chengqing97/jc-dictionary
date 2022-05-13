@@ -1,8 +1,9 @@
 {
   "expo": {
-    "name": "jc-dictionary",
+    "name": "JC Dictionary",
+    "description": "Extremely simple and functional mobile dictionary.",
     "slug": "jc-dictionary",
-    "version": "1.0.0",
+    "version": "0.2.0",
     "jsEngine": "hermes",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -10,15 +11,13 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#d4f6d5"
     },
     "primaryColor": "#d4f6d5",
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.cqcreative.jcdictionary"
@@ -26,7 +25,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FFFFFF"
+        "backgroundColor": "#d4f6d5"
       },
       "package": "com.cqcreative.jcdictionary"
     },

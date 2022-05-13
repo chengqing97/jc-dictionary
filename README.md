@@ -25,10 +25,8 @@ Extremely simple and functional mobile dictionary grabbing definitions and trans
 
 ### To-dos
 
-- [ ] splash screen and icon
 - [ ] sponsor function
-- [ ] Better history function
 
 ### Issues
 
-- [ ] cannot unzip database on ios
+- [ ] will keep trying to setup local database every time opening the app when there is no enough storage
