@@ -1,6 +1,6 @@
 # 简单粗暴实用小词典
 
-Extremely simple and functional mobile dictionary grabbing definitions and translation from [Youdao Dictionary](https://www.youdao.com/) and voice from [Cambridge Dictionary](https://dictionary.cambridge.org/).
+Extremely simple and functional mobile dictionary using [ECDICT](https://github.com/skywind3000/ECDICT) as offline dictionary, grabbing definitions and translation from [Youdao Dictionary](https://www.youdao.com/) as online dictionary and using voice from [Cambridge Dictionary](https://dictionary.cambridge.org/).
 
 ![jc-dictionary](https://github.com/chengqing97/jc-dictionary/blob/main/assets/logo.png?raw=true)
 
@@ -17,9 +17,9 @@ Extremely simple and functional mobile dictionary grabbing definitions and trans
 
 整个 APP 只有一页：不用点来点去！
 
-另外特别感谢有道词典和 Cambridge Dictionary 提供大众免费的查词服务。本词典并没有自己的词汇数据库，译义来自有道词典，人声来自 Cambridge Dictionary。
+另外特别感谢 ECDICT、有道词典和 Cambridge Dictionary 提供大众免费的查词服务。本词典并没有自己的词汇数据库，译义来自有道词典，人声来自 Cambridge Dictionary。
 
-最后，本词典是一个刚刚诞生的 APP，还需要很多意见她变得更为完善，因此希望大家能多多反馈意见。另外，若有设计师愿意提供更美观的界面设计，欢迎联系我！
+最后，本词典是一个刚刚诞生的APP，还需要很多意见她变得更为完善，因此希望大家能多多反馈意见。另外，若有设计师愿意提供更美观的界面设计，欢迎联系我！
 
 ## Development Process
 
