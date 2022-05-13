@@ -2,7 +2,7 @@
 
 Extremely simple and functional mobile dictionary grabbing definitions and translation from [Youdao Dictionary](https://www.youdao.com/) and voice from [Cambridge Dictionary](https://dictionary.cambridge.org/).
 
-![jc-dictionary](https://github.com/chengqing97/jc-dictionary/blob/main/logo.png?raw=true)
+![jc-dictionary](https://github.com/chengqing97/jc-dictionary/blob/main/assets/logo.png?raw=true)
 
 现在市面上的词典 APP 功能日益丰富，然而丰富的功能却造成了许多问题：
 
