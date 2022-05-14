@@ -23,10 +23,10 @@ Extremely simple and functional mobile dictionary grabbing definitions and trans
 
 ## Development Process
 
-### To-dos
-
-- [ ] sponsor function
-
 ### Issues
 
 - [ ] will keep trying to setup local database every time opening the app when there is no enough storage
+
+## Buy me a coffee
+
+![Buy me a coffee](https://github.com/chengqing97/jc-dictionary/blob/main/assets/e-wallet/qrcodes.png?raw=true)

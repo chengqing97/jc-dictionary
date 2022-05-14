@@ -1,10 +1,8 @@
 import { Platform } from "react-native";
 import { useEffect, useState } from "react";
-import { useRecoilState } from "recoil";
 import * as SQLite from "expo-sqlite";
 import * as FileSystem from "expo-file-system";
 import { Asset } from "expo-asset";
-import { databaseState } from "../functions/states";
 import { unzip } from "react-native-zip-archive";
 
 export function useLoadDatabase() {

@@ -3,16 +3,16 @@ import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
-  SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
   View,
+  SafeAreaView,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { darkPrimaryColor, primaryColor } from "../functions/constants";
 import { useRecoilValue } from "recoil";
-import { isLoadingVoiceState, playbackObjectState, searchingTextState } from "../functions/states";
+import { isLoadingVoiceState, lookupStatusState, playbackObjectState, searchingTextState } from "../functions/states";
 import { Audio } from "expo-av";
 import usePlayVoice from "../hooks/usePlayVoice";
 import useSearch from "../hooks/useSearch";
@@ -26,6 +26,7 @@ export default function InputBar() {
   const searchingText = useRecoilValue(searchingTextState);
   const playbackObject = useRecoilValue(playbackObjectState);
   const isLoadingVoice = useRecoilValue(isLoadingVoiceState);
+  const lookupStatus = useRecoilValue(lookupStatusState);
 
   useEffect(() => {
     setTimeout(() => {
@@ -56,6 +57,7 @@ export default function InputBar() {
               style={styles.textInput}
               selectionColor={Platform.OS === "ios" ? darkPrimaryColor : undefined}
               blurOnSubmit={false}
+              placeholder={lookupStatus === "init" ? "开始搜索..." : undefined}
               autoFocus={Platform.OS === "ios"}
               onSubmitEditing={handleSearch}
               value={inputText}
@@ -79,7 +81,7 @@ export default function InputBar() {
           )}
           {!!searchingText && (
             <Pressable style={styles.tagButton} hitSlop={5} onPress={() => setInputText(searchingText)}>
-              <Text style={styles.tagButtonText} textBreakStrategy="highQuality">
+              <Text style={styles.tagButtonText} numberOfLines={1} textBreakStrategy="highQuality">
                 {searchingText}
               </Text>
             </Pressable>
@@ -98,6 +100,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     padding: gap,
+    paddingTop: 0,
   },
   inputBox: {
     borderRadius: inputBoxHeight / 2,
@@ -112,11 +115,13 @@ const styles = StyleSheet.create({
     flex: 1,
     fontFamily: "Roboto-R",
     fontSize: 16,
-    paddingHorizontal: inputBoxHeight / 3,
+    paddingLeft: inputBoxHeight / 3,
+    paddingRight: 5,
   },
   clearButton: {
     height: inputBoxHeight,
-    width: inputBoxHeight,
+    paddingRight: 10,
+    marginLeft: 5,
     alignItems: "center",
     justifyContent: "center",
   },

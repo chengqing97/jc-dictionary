@@ -1,7 +1,6 @@
 import { atom } from "recoil";
 import { LookupStatus, LookupResult } from "./types";
 import { Audio } from "expo-av";
-import { WebSQLDatabase } from "expo-sqlite";
 
 export const lookupStatusState = atom<LookupStatus>({
   key: "lookupStatusState",
@@ -38,7 +37,17 @@ export const axiosControllerState = atom({
   default: new AbortController(),
 });
 
-export const databaseState = atom<WebSQLDatabase | null>({
-  key: "databaseState",
-  default: null,
+export const isChinaState = atom({
+  key: "isChinaState",
+  default: true,
+});
+
+export const showMenuState = atom({
+  key: "showMenuState",
+  default: false,
+});
+
+export const showCoffeeState = atom({
+  key: "showCoffeeState",
+  default: false,
 });

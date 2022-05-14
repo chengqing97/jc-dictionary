@@ -1,5 +1,5 @@
-import { axiosControllerState, databaseState } from "./../functions/states";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { axiosControllerState } from "./../functions/states";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import {
   errorMessageState,
   isLoadingVoiceState,
@@ -12,7 +12,6 @@ import { grabResult } from "../functions/youdao";
 import { grabVoiceUrl } from "../functions/cambridge";
 import { Audio } from "expo-av";
 import axios from "axios";
-import * as SQLite from "expo-sqlite";
 import { useContext } from "react";
 import { Context } from "../functions/context";
 import { LookupResult } from "../functions/types";
@@ -60,6 +59,9 @@ export default function useSearch() {
               )
             : () => {},
         ]);
+      })
+      .catch((error) => {
+        console.log("Get voice url error: ", error);
       })
       .finally(() => {
         setIsLoadingVoice(false);

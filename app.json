@@ -1,9 +1,9 @@
 {
   "expo": {
-    "name": "JC Dictionary",
+    "name": "实用小词典",
     "description": "Extremely simple and functional mobile dictionary.",
     "slug": "jc-dictionary",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "jsEngine": "hermes",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -31,6 +31,14 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-media-library",
+        {
+          "savePhotosPermission": "允许简单粗暴实用小词典保存至相册"
+        }
+      ]
+    ]
   }
 }
