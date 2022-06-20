@@ -51,3 +51,8 @@ export const showCoffeeState = atom({
   key: "showCoffeeState",
   default: false,
 });
+
+export const databaseStatusState = atom({
+  key: "databaseStatusState",
+  default: "",
+});

@@ -7,6 +7,7 @@ import {
   searchingTextState,
   playbackObjectState,
   isLoadingVoiceState,
+  databaseStatusState,
 } from "../functions/states";
 import { useRecoilValue } from "recoil";
 import { darkPrimaryColor } from "../functions/constants";
@@ -23,6 +24,7 @@ export default function ResultArea() {
   const search = useSearch();
   const playbackObject = useRecoilValue(playbackObjectState);
   const isLoadingVoice = useRecoilValue(isLoadingVoiceState);
+  const databaseStatus = useRecoilValue(databaseStatusState);
 
   return (
     <View style={{ flex: 1 }}>
@@ -32,6 +34,7 @@ export default function ResultArea() {
             return (
               <View style={{ flexGrow: 1, alignItems: "center", justifyContent: "center" }}>
                 <Text style={styles.greetingText}>你好！</Text>
+                <Text style={styles.greetingText}>{databaseStatus}</Text>
               </View>
             );
           if (lookupStatus === "searching")

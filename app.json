@@ -3,7 +3,7 @@
     "name": "实用小词典",
     "description": "Extremely simple and functional mobile dictionary.",
     "slug": "jc-dictionary",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "jsEngine": "hermes",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
